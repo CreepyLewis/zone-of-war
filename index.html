@@ -1,1 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZONE OF WAR</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
 
+  <!-- ═══════════════ LOADING SCREEN ═══════════════ -->
+  <div id="loading-screen">
+    <div class="loading-inner">
+      <div class="logo-text">ZONE<span>OF</span>WAR</div>
+      <div class="load-bar-wrap"><div id="load-bar"></div></div>
+      <p id="load-status">Initializing Engine...</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════ MAIN MENU ═══════════════ -->
+  <div id="main-menu" class="screen hidden">
+    <div class="menu-bg-overlay"></div>
+    <div class="menu-content">
+      <div class="logo-text large">ZONE<span>OF</span>WAR</div>
+      <p class="tagline">Survive Every Round. Eliminate Every Threat.</p>
+      <nav class="menu-nav">
+        <button id="btn-play"     class="menu-btn glow-btn">▶  DEPLOY</button>
+        <button id="btn-settings" class="menu-btn">⚙  SETTINGS</button>
+        <button id="btn-controls" class="menu-btn">⌨  CONTROLS</button>
+      </nav>
+      <div class="version-tag">v1.0.0 — Built with Three.js</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SETTINGS ═══════════════ -->
+  <div id="settings-panel" class="screen hidden">
+    <div class="panel-box">
+      <h2>SETTINGS</h2>
+      <div class="setting-row">
+        <label>Mouse Sensitivity</label>
+        <input type="range" id="s-sens" min="0.2" max="4" step="0.1" value="1.2" />
+        <span id="s-sens-val">1.2</span>
+      </div>
+      <div class="setting-row">
+        <label>Sound Volume</label>
+        <input type="range" id="s-vol" min="0" max="1" step="0.1" value="0.6" />
+        <span id="s-vol-val">0.6</span>
+      </div>
+      <div class="setting-row">
+        <label>Difficulty</label>
+        <select id="s-diff">
+          <option value="easy">Recruit</option>
+          <option value="normal" selected>Soldier</option>
+          <option value="hard">Veteran</option>
+          <option value="extreme">Legend</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label>Field of View</label>
+        <input type="range" id="s-fov" min="60" max="110" step="5" value="75" />
+        <span id="s-fov-val">75°</span>
+      </div>
+      <button id="btn-settings-back" class="menu-btn">← BACK</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ CONTROLS ═══════════════ -->
+  <div id="controls-panel" class="screen hidden">
+    <div class="panel-box">
+      <h2>CONTROLS</h2>
+      <table class="ctrl-table">
+        <tr><td>W A S D</td><td>Move</td></tr>
+        <tr><td>Mouse</td><td>Look Around</td></tr>
+        <tr><td>Left Click</td><td>Shoot</td></tr>
+        <tr><td>Right Click</td><td>Aim Down Sights</td></tr>
+        <tr><td>R</td><td>Reload</td></tr>
+        <tr><td>1 · 2 · 3</td><td>Switch Weapon</td></tr>
+        <tr><td>Shift</td><td>Sprint</td></tr>
+        <tr><td>Ctrl</td><td>Crouch</td></tr>
+        <tr><td>Space</td><td>Jump</td></tr>
+        <tr><td>G</td><td>Throw Grenade</td></tr>
+        <tr><td>Tab</td><td>Scoreboard</td></tr>
+        <tr><td>Esc</td><td>Pause / Menu</td></tr>
+      </table>
+      <button id="btn-controls-back" class="menu-btn">← BACK</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ GAME CANVAS ═══════════════ -->
+  <canvas id="game-canvas"></canvas>
+
+  <!-- ═══════════════ HUD ═══════════════ -->
+  <div id="hud" class="hidden">
+
+    <!-- Crosshair -->
+    <div id="crosshair">
+      <div class="ch top"></div>
+      <div class="ch bottom"></div>
+      <div class="ch left"></div>
+      <div class="ch right"></div>
+    </div>
+
+    <!-- Bottom Left – Health & Armor -->
+    <div id="vitals">
+      <div class="vital-row">
+        <span class="vital-icon">♥</span>
+        <div class="bar-track"><div id="hp-bar" class="bar-fill hp"></div></div>
+        <span id="hp-val">100</span>
+      </div>
+      <div class="vital-row">
+        <span class="vital-icon">◈</span>
+        <div class="bar-track"><div id="armor-bar" class="bar-fill armor"></div></div>
+        <span id="armor-val">0</span>
+      </div>
+    </div>
+
+    <!-- Bottom Right – Weapon/Ammo -->
+    <div id="weapon-hud">
+      <div id="weapon-name-hud">ASSAULT RIFLE</div>
+      <div id="ammo-display">
+        <span id="ammo-mag">30</span>
+        <span class="ammo-sep"> / </span>
+        <span id="ammo-res">90</span>
+      </div>
+      <div id="weapon-slots">
+        <div class="wslot active" id="ws1">1 · PISTOL</div>
+        <div class="wslot"        id="ws2">2 · AR</div>
+        <div class="wslot"        id="ws3">3 · SHOTGUN</div>
+      </div>
+    </div>
+
+    <!-- Top Right – Round Info -->
+    <div id="round-hud">
+      <div id="round-label">ROUND</div>
+      <div id="round-num">1</div>
+      <div id="score-hud">0 PTS</div>
+      <div id="enemies-hud">ENEMIES: <span id="enemy-count">0</span></div>
+    </div>
+
+    <!-- Kill Feed -->
+    <div id="kill-feed"></div>
+
+    <!-- Minimap -->
+    <div id="minimap-wrap">
+      <canvas id="minimap" width="160" height="160"></canvas>
+      <div id="minimap-label">MAP</div>
+    </div>
+
+    <!-- Floating messages -->
+    <div id="reload-msg"  class="float-msg hidden">⟳ RELOADING</div>
+    <div id="hit-marker"  class="hidden">✦</div>
+    <div id="round-clear" class="float-msg big-msg hidden">✔ ROUND CLEAR</div>
+    <div id="wave-start"  class="float-msg big-msg hidden"></div>
+
+    <!-- Damage vignette -->
+    <div id="dmg-vignette"></div>
+
+    <!-- Grenade count -->
+    <div id="grenade-hud">💣 <span id="nade-count">2</span></div>
+  </div>
+
+  <!-- ═══════════════ PAUSE MENU ═══════════════ -->
+  <div id="pause-menu" class="screen hidden">
+    <div class="panel-box">
+      <h2>PAUSED</h2>
+      <button id="btn-resume"     class="menu-btn glow-btn">▶ RESUME</button>
+      <button id="btn-restart"    class="menu-btn">↺ RESTART</button>
+      <button id="btn-to-menu"    class="menu-btn">⌂ MAIN MENU</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ GAME OVER ═══════════════ -->
+  <div id="game-over" class="screen hidden">
+    <div class="panel-box">
+      <h2 id="go-title">MISSION FAILED</h2>
+      <div id="go-stats">
+        <div class="stat-row"><span>Rounds Survived</span><span id="go-rounds">0</span></div>
+        <div class="stat-row"><span>Total Kills</span><span id="go-kills">0</span></div>
+        <div class="stat-row"><span>Accuracy</span><span id="go-acc">0%</span></div>
+        <div class="stat-row final"><span>FINAL SCORE</span><span id="go-score">0</span></div>
+      </div>
+      <button id="btn-again"    class="menu-btn glow-btn">↺ PLAY AGAIN</button>
+      <button id="btn-go-menu"  class="menu-btn">⌂ MAIN MENU</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ POINTER LOCK PROMPT ═══════════════ -->
+  <div id="lock-prompt" class="screen hidden">
+    <div class="lock-inner">
+      <div class="lock-icon">⊕</div>
+      <p>Click to enter the battlefield</p>
+      <small>Press <kbd>ESC</kbd> to release mouse</small>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SCRIPTS ═══════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/weapon.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/enemy.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/hud.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
